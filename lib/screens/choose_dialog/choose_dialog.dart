@@ -6,7 +6,7 @@ import 'package:terrarium/screens/choose_dialog/cubit.dart';
 import 'package:terrarium/screens/choose_dialog/state.dart';
 
 class ChooseDialog extends StatelessWidget {
-  static Future<ImageProvider?> openDialog(
+  static Future<AssetImage?> openDialog(
     BuildContext context,
     List<ImageProvider> images,
   ) {

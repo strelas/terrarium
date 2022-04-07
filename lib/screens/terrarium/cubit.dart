@@ -1,15 +1,24 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:terrarium/screens/choose_dialog/choose_dialog.dart';
 import 'package:terrarium/screens/terrarium/state.dart';
 
 class TerrariumCubit extends Cubit<TerrariumState> {
   final BuildContext _context;
+  final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
-  TerrariumCubit(this._context) : super(const TerrariumState([]));
+  TerrariumCubit(this._context) : super(const TerrariumState([])) {
+    _storage.read(key: "terrariumState").then((value) {
+      if (value != null) {
+        emit(TerrariumState.fromJson(jsonDecode(value)));
+      }
+    });
+  }
 
   updatePosition(Offset position, Size size, int id) {
     final result = state.items.map(
@@ -118,5 +127,11 @@ class TerrariumCubit extends Cubit<TerrariumState> {
   delete(int id) {
     final result = state.items.where((element) => element.id != id).toList();
     emit(TerrariumState(result));
+  }
+
+  @override
+  void emit(TerrariumState state) {
+    _storage.write(key: "terrariumState", value: jsonEncode(state.toJson()));
+    super.emit(state);
   }
 }
