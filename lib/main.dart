@@ -69,6 +69,12 @@ class _MyHomePageState extends State<MyHomePage> {
                           },
                           child: const Text("Добавить растение"),
                         ),
+                        TextButton(
+                          onPressed: () {
+                            context.read<TerrariumCubit>().clearTerrarium();
+                          },
+                          child: const Text("Почистить террариум"),
+                        ),
                       ],
                     ),
                   ),

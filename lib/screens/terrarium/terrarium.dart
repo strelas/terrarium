@@ -18,16 +18,24 @@ class _TerrariumState extends State<Terrarium> {
 
   TerrariumCubit get cubit => context.read();
 
-  void _showMenu(int toDelete, Offset tapPosition) {
-    showMenu(
-        context: context,
-        position: RelativeRect.fromRect(
-          tapPosition & const Size(40, 40),
-          const Offset(40.0, 60.0) & context.size!,
-        ),
-        items: [const HintsPopupMenuEntry()]).then((value) {
+  void _showMenu(int id, Offset tapPosition) {
+    showMenu<Response>(
+            context: context,
+            position: RelativeRect.fromRect(
+              tapPosition & const Size(40, 40),
+              const Offset(40.0, 60.0) & context.size!,
+            ),
+            items: [const HintsPopupMenuDelete(), const HintsPopupMenuStatus()])
+        .then((value) {
       if (value != null) {
-        cubit.delete(toDelete);
+        switch (value) {
+          case Response.delete:
+            cubit.delete(id);
+            break;
+          case Response.status:
+            cubit.openStatusDialog(id);
+            break;
+        }
       }
     });
   }
@@ -53,6 +61,14 @@ class _TerrariumState extends State<Terrarium> {
             },
             child: Stack(
               children: [
+                Positioned(
+                  top: 10,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: Text("Загрязнение террариума: ${100 - state.health}%"),
+                  ),
+                ),
                 Positioned.fill(
                   child: Column(
                     children: [
@@ -81,12 +97,15 @@ class _TerrariumState extends State<Terrarium> {
                           selected = e;
                         }
                       },
-                      child: Container(
-                        color: const Color(0x00000000),
-                        child: Image(
-                          image: e.image,
-                          height: e.height * constraints.maxHeight,
-                          width: e.width * constraints.maxWidth,
+                      child: Opacity(
+                        opacity: e.health == 0 ? 0.5 : 1,
+                        child: Container(
+                          color: const Color(0x00000000),
+                          child: Image(
+                            image: e.image,
+                            height: e.height * constraints.maxHeight,
+                            width: e.width * constraints.maxWidth,
+                          ),
                         ),
                       ),
                     ),

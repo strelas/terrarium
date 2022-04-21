@@ -2,14 +2,26 @@ import 'package:flutter/material.dart';
 
 class TerrariumState {
   final List<ItemModel> items;
+  final int health;
 
-  const TerrariumState(this.items);
+  const TerrariumState(this.items, this.health);
 
-  dynamic toJson() => {"items": items.map((e) => e.toJson()).toList()};
+  dynamic toJson() =>
+      {"items": items.map((e) => e.toJson()).toList(), "health": health};
 
   TerrariumState.fromJson(dynamic json)
       : items =
-            (json["items"] as List).map((e) => ItemModel.fromJson(e)).toList();
+            (json["items"] as List).map((e) => ItemModel.fromJson(e)).toList(),
+        health = json["health"];
+
+  TerrariumState copyWith({
+    List<ItemModel>? items,
+    int? health,
+  }) =>
+      TerrariumState(
+        items ?? this.items,
+        health ?? this.health,
+      );
 }
 
 class ItemModel {
@@ -19,6 +31,8 @@ class ItemModel {
   final double height;
   final double width;
   final AssetImage image;
+  final int health;
+  final Type type;
 
   ItemModel({
     required this.id,
@@ -27,6 +41,8 @@ class ItemModel {
     required this.height,
     required this.width,
     required this.image,
+    required this.health,
+    required this.type,
   });
 
   dynamic toJson() => {
@@ -35,7 +51,9 @@ class ItemModel {
         "top": top,
         "height": height,
         "width": width,
-        "image": image.assetName
+        "image": image.assetName,
+        "health": health,
+        "type": type.index,
       };
 
   ItemModel.fromJson(Map<String, dynamic> json)
@@ -44,7 +62,20 @@ class ItemModel {
         top = json["top"],
         height = json["height"],
         width = json["width"],
-        image = AssetImage(json["image"]);
+        image = AssetImage(json["image"]),
+        health = json["health"],
+        type = Type.values[json["type"]];
+
+  ItemModel copyWith({int? health}) => ItemModel(
+        id: id,
+        left: left,
+        top: top,
+        height: height,
+        width: width,
+        image: image,
+        health: health ?? this.health,
+        type: type,
+      );
 
   @override
   String toString() {
@@ -55,3 +86,5 @@ class ItemModel {
 class Images {
   static const lion = AssetImage("assets/lion.png");
 }
+
+enum Type { plant, animal, decoration }
