@@ -61,14 +61,6 @@ class _TerrariumState extends State<Terrarium> {
             },
             child: Stack(
               children: [
-                Positioned(
-                  top: 10,
-                  left: 0,
-                  right: 0,
-                  child: Center(
-                    child: Text("Загрязнение террариума: ${100 - state.health}%"),
-                  ),
-                ),
                 Positioned.fill(
                   child: Column(
                     children: [
@@ -110,7 +102,28 @@ class _TerrariumState extends State<Terrarium> {
                       ),
                     ),
                   ),
-                )
+                ),
+                Positioned(
+                  top: 10,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child:
+                        Text("Загрязнение террариума: ${100 - state.health}%"),
+                  ),
+                ),
+                Positioned(
+                  top: 20,
+                  left: 20,
+                  child: IconButton(
+                    onPressed: () {
+                      cubit.pauseToggle();
+                    },
+                    icon: Icon(
+                      state.isPaused ? Icons.play_arrow : Icons.pause,
+                    ),
+                  ),
+                ),
               ],
             ),
           );

@@ -12,6 +12,7 @@ void main() {
   testWidgets('Clear terrarium test', (WidgetTester tester) async {
     await tester.binding.setSurfaceSize(windowSize);
     final cubit = TerrariumCubit();
+    cubit.pauseToggle();
     await tester.pumpWidget(MyApp(
       cubit: cubit,
     ));
@@ -39,7 +40,7 @@ void main() {
     await tester.tap(find.text("Добавить", skipOffstage: false));
     await tester.pumpAndSettle();
 
-    expect(find.image(Images.lion), findsOneWidget);
+    expect(find.byType(Image), findsOneWidget);
   });
 
   testWidgets('Add plant test', (WidgetTester tester) async {
@@ -112,15 +113,16 @@ void main() {
           top: 0.5,
           height: 0.1,
           width: 0.1,
-          image: Images.lion,
+          image: Images.stone,
           health: 50,
           type: Type.animal,
         ),
       ],
       100,
+      true,
     ));
     await tester.pump();
-    final element = find.image(Images.lion);
+    final element = find.image(Images.stone);
     expect(element, findsOneWidget);
     await tester.tap(element, buttons: kSecondaryButton);
     await tester.pump();
@@ -168,15 +170,16 @@ void main() {
           top: 0.5,
           height: 0.1,
           width: 0.1,
-          image: Images.lion,
+          image: Images.stone,
           health: 50,
           type: Type.plant,
         ),
       ],
       100,
+      true,
     ));
     await tester.pump();
-    final element = find.image(Images.lion);
+    final element = find.image(Images.stone);
     expect(element, findsOneWidget);
     await tester.tap(element, buttons: kSecondaryButton);
     await tester.pump();
@@ -224,15 +227,16 @@ void main() {
           top: 0.5,
           height: 0.1,
           width: 0.1,
-          image: Images.lion,
+          image: Images.stone,
           health: 50,
           type: Type.plant,
         ),
       ],
       100,
+      true,
     ));
     await tester.pump();
-    final element = find.image(Images.lion);
+    final element = find.image(Images.stone);
     expect(element, findsOneWidget);
     await tester.tap(element, buttons: kSecondaryButton);
     await tester.pump();
@@ -242,6 +246,6 @@ void main() {
     expect(statusElement, findsOneWidget);
     await tester.tap(statusElement);
     await tester.pump();
-    expect(find.image(Images.lion), findsNothing);
+    expect(find.image(Images.stone), findsNothing);
   });
 }

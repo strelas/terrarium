@@ -16,13 +16,16 @@ class TerrariumCubit extends Cubit<TerrariumState> {
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
   Timer? _timer;
 
-  TerrariumCubit() : super(const TerrariumState([], 100)) {
+  TerrariumCubit() : super(const TerrariumState([], 100, true)) {
     _storage.read(key: "terrariumState").then((value) {
       if (value != null) {
-        emit(TerrariumState.fromJson(jsonDecode(value)));
+        final state = TerrariumState.fromJson(jsonDecode(value));
+        emit(state);
+        if (!state.isPaused) {
+          startHealthDecreasing();
+        }
       }
     });
-    startHealthDecreasing();
   }
 
   dispose() {
@@ -30,15 +33,26 @@ class TerrariumCubit extends Cubit<TerrariumState> {
     _timer = null;
   }
 
+  pauseToggle() {
+    if (state.isPaused) {
+      startHealthDecreasing();
+    } else {
+      dispose();
+    }
+    emit(state.copyWith(isPaused: !state.isPaused));
+  }
+
   startHealthDecreasing() {
     _timer = Timer.periodic(_period, (_) {
       final items = state.items.map(
-            (e) => e.copyWith(
-          health: max(
-            0,
-            e.health - (state.health > 40 ? 1 : 2),
-          ),
-        ),
+            (e) =>
+            e.copyWith(
+              health: max(
+                0,
+                e.type == Type.decoration ? e.health : e.health -
+                    (state.health > 40 ? 1 : 2),
+              ),
+            ),
       );
 
       num positiveChance = 1 -
@@ -78,7 +92,7 @@ class TerrariumCubit extends Cubit<TerrariumState> {
 
   updatePosition(Offset position, Size size, int id) {
     final result = state.items.map(
-      (e) {
+          (e) {
         if (e.id == id) {
           return ItemModel(
             id: e.id,
@@ -100,13 +114,14 @@ class TerrariumCubit extends Cubit<TerrariumState> {
 
   feedAnimal(int id) {
     final items = state.items.map(
-      (e) => e.id == id && e.health != 0
+          (e) =>
+      e.id == id && e.health != 0
           ? e.copyWith(
-              health: min(
-                100,
-                e.health + 20,
-              ),
-            )
+        health: min(
+          100,
+          e.health + 20,
+        ),
+      )
           : e,
     );
 
@@ -119,13 +134,14 @@ class TerrariumCubit extends Cubit<TerrariumState> {
 
   waterPlant(int id) {
     final items = state.items.map(
-      (e) => e.id == id && e.health != 0
+          (e) =>
+      e.id == id && e.health != 0
           ? e.copyWith(
-              health: min(
-                100,
-                e.health + 20,
-              ),
-            )
+        health: min(
+          100,
+          e.health + 20,
+        ),
+      )
           : e,
     );
 
@@ -133,14 +149,7 @@ class TerrariumCubit extends Cubit<TerrariumState> {
   }
 
   addAnimal() async {
-    final toAdd = await ChooseDialog.openDialog(context, [
-      Images.lion,
-      Images.lion,
-      Images.lion,
-      Images.lion,
-      Images.lion,
-      Images.lion,
-    ]);
+    final toAdd = await ChooseDialog.openDialog(context, Images.animals);
 
     if (toAdd != null) {
       final result = [
@@ -150,8 +159,8 @@ class TerrariumCubit extends Cubit<TerrariumState> {
                 Random.secure().nextInt(10000),
             left: 0,
             top: 0,
-            height: 0.1,
-            width: 0.1,
+            height: 0.2,
+            width: 0.2,
             image: toAdd,
             health: 100,
             type: Type.animal)
@@ -162,14 +171,7 @@ class TerrariumCubit extends Cubit<TerrariumState> {
   }
 
   addPlant() async {
-    final toAdd = await ChooseDialog.openDialog(context, [
-      Images.lion,
-      Images.lion,
-      Images.lion,
-      Images.lion,
-      Images.lion,
-      Images.lion,
-    ]);
+    final toAdd = await ChooseDialog.openDialog(context, Images.plants);
 
     if (toAdd != null) {
       final result = [
@@ -179,8 +181,8 @@ class TerrariumCubit extends Cubit<TerrariumState> {
               Random.secure().nextInt(10000),
           left: 0,
           top: 0,
-          height: 0.1,
-          width: 0.1,
+          height: 0.2,
+          width: 0.2,
           image: toAdd,
           health: 100,
           type: Type.plant,
@@ -200,14 +202,7 @@ class TerrariumCubit extends Cubit<TerrariumState> {
   }
 
   addDecoration() async {
-    final toAdd = await ChooseDialog.openDialog(context, [
-      Images.lion,
-      Images.lion,
-      Images.lion,
-      Images.lion,
-      Images.lion,
-      Images.lion,
-    ]);
+    final toAdd = await ChooseDialog.openDialog(context, Images.decorations);
 
     if (toAdd != null) {
       final result = [
@@ -217,8 +212,8 @@ class TerrariumCubit extends Cubit<TerrariumState> {
               Random.secure().nextInt(10000),
           left: 0,
           top: 0,
-          height: 0.1,
-          width: 0.1,
+          height: 0.2,
+          width: 0.2,
           image: toAdd,
           health: 100,
           type: Type.decoration,

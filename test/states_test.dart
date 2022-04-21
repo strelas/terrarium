@@ -11,11 +11,12 @@ void main() {
             top: 0.5,
             height: 0.1,
             width: 0.1,
-            image: Images.lion,
+            image: Images.stone,
             health: 55,
             type: Type.plant)
       ],
       100,
+      true,
     );
     final fromJsonState = TerrariumState.fromJson(state.toJson());
     expect(state, fromJsonState);
