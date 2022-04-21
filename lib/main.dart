@@ -4,11 +4,13 @@ import 'package:terrarium/screens/terrarium/cubit.dart';
 import 'package:terrarium/screens/terrarium/terrarium.dart';
 
 void main() {
-  runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(MyApp(cubit: TerrariumCubit(),));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  final TerrariumCubit cubit;
+  MyApp({Key? key, required this.cubit}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -17,27 +19,33 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(cubit: cubit),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  final String title;
+  final TerrariumCubit cubit;
+  const MyHomePage({Key? key, required this.cubit}) : super(key: key);
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+
+
+  @override
+  void dispose() {
+    widget.cubit.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: BlocProvider(
-        create: (context) => TerrariumCubit(context),
+        create: (context) => widget.cubit..context = context,
         child: Builder(
           builder: (context) {
             return Center(

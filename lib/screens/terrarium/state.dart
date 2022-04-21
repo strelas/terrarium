@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 class TerrariumState {
@@ -22,6 +23,17 @@ class TerrariumState {
         items ?? this.items,
         health ?? this.health,
       );
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TerrariumState &&
+          runtimeType == other.runtimeType &&
+          const ListEquality().equals(items, other.items) &&
+          health == other.health;
+
+  @override
+  int get hashCode => const ListEquality().hash(items) ^ health.hashCode;
 }
 
 class ItemModel {
@@ -44,6 +56,31 @@ class ItemModel {
     required this.health,
     required this.type,
   });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ItemModel &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          left == other.left &&
+          top == other.top &&
+          height == other.height &&
+          width == other.width &&
+          image == other.image &&
+          health == other.health &&
+          type == other.type;
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      left.hashCode ^
+      top.hashCode ^
+      height.hashCode ^
+      width.hashCode ^
+      image.hashCode ^
+      health.hashCode ^
+      type.hashCode;
 
   dynamic toJson() => {
         "id": id,

@@ -12,11 +12,11 @@ import 'package:terrarium/screens/terrarium/state.dart';
 
 class TerrariumCubit extends Cubit<TerrariumState> {
   final _period = const Duration(seconds: 1);
-  final BuildContext _context;
+  late BuildContext context;
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
-  StreamSubscription? _subscription;
+  Timer? _timer;
 
-  TerrariumCubit(this._context) : super(const TerrariumState([], 100)) {
+  TerrariumCubit() : super(const TerrariumState([], 100)) {
     _storage.read(key: "terrariumState").then((value) {
       if (value != null) {
         emit(TerrariumState.fromJson(jsonDecode(value)));
@@ -25,10 +25,15 @@ class TerrariumCubit extends Cubit<TerrariumState> {
     startHealthDecreasing();
   }
 
+  dispose() {
+    _timer?.cancel();
+    _timer = null;
+  }
+
   startHealthDecreasing() {
-    _subscription = Stream.periodic(_period).listen((_) {
+    _timer = Timer.periodic(_period, (_) {
       final items = state.items.map(
-        (e) => e.copyWith(
+            (e) => e.copyWith(
           health: max(
             0,
             e.health - (state.health > 40 ? 1 : 2),
@@ -36,30 +41,30 @@ class TerrariumCubit extends Cubit<TerrariumState> {
         ),
       );
 
-      num chance = 1 -
+      num positiveChance = 1 -
           pow(
             0.9,
             state.items
                 .where(
                   (element) =>
-                      element.type == Type.decoration && element.health > 0,
-                )
+              element.type == Type.decoration && element.health > 0,
+            )
                 .length,
           );
 
-      num anotherChance = 1 -
+      num negativeChance = 1 -
           pow(
             0.9,
             state.items
                 .where((element) =>
-                    element.health == 0 && element.type != Type.decoration)
+            element.health == 0 && element.type != Type.decoration)
                 .length,
           );
 
       var newHealth = state.health -
           1 +
-          (Random().nextDouble() < chance ? 1 : 0) -
-          (Random().nextDouble() < anotherChance ? 1 : 0);
+          (Random().nextDouble() < positiveChance ? 1 : 0) -
+          (Random().nextDouble() < negativeChance ? 1 : 0);
 
       emit(state.copyWith(
         items: items.toList(),
@@ -128,7 +133,7 @@ class TerrariumCubit extends Cubit<TerrariumState> {
   }
 
   addAnimal() async {
-    final toAdd = await ChooseDialog.openDialog(_context, [
+    final toAdd = await ChooseDialog.openDialog(context, [
       Images.lion,
       Images.lion,
       Images.lion,
@@ -157,7 +162,7 @@ class TerrariumCubit extends Cubit<TerrariumState> {
   }
 
   addPlant() async {
-    final toAdd = await ChooseDialog.openDialog(_context, [
+    final toAdd = await ChooseDialog.openDialog(context, [
       Images.lion,
       Images.lion,
       Images.lion,
@@ -188,14 +193,14 @@ class TerrariumCubit extends Cubit<TerrariumState> {
 
   openStatusDialog(int id) {
     StatusDialog.open(
-      _context,
+      context,
       this,
       id,
     );
   }
 
   addDecoration() async {
-    final toAdd = await ChooseDialog.openDialog(_context, [
+    final toAdd = await ChooseDialog.openDialog(context, [
       Images.lion,
       Images.lion,
       Images.lion,

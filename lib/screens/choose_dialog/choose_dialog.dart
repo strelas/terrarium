@@ -49,27 +49,30 @@ class ChooseDialog extends StatelessWidget {
                   alignment: WrapAlignment.spaceAround,
                   runAlignment: WrapAlignment.spaceAround,
                   children: [
-                    ...state.models.map((e) {
-                      return GestureDetector(
-                        onTap: () {
-                          context.read<ChooseDialogCubit>().select(e.id);
-                        },
-                        child: Container(
-                          width: 200,
-                          height: 200,
-                          padding: e.id == state.choosed
-                              ? null
-                              : const EdgeInsets.all(5),
-                          decoration: BoxDecoration(
-                            color: const Color(0x00000000),
-                            border: e.id == state.choosed
-                                ? Border.all(
-                                    color: Colors.lightGreenAccent,
-                                    width: 5,
-                                  )
-                                : null,
+                    ...state.models.mapIndexed((index, e) {
+                      return Tooltip(
+                        message: "Choose $index",
+                        child: GestureDetector(
+                          onTap: () {
+                            context.read<ChooseDialogCubit>().select(e.id);
+                          },
+                          child: Container(
+                            width: 200,
+                            height: 200,
+                            padding: e.id == state.choosed
+                                ? null
+                                : const EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                              color: const Color(0x00000000),
+                              border: e.id == state.choosed
+                                  ? Border.all(
+                                      color: Colors.lightGreenAccent,
+                                      width: 5,
+                                    )
+                                  : null,
+                            ),
+                            child: Image(image: e.image),
                           ),
-                          child: Image(image: e.image),
                         ),
                       );
                     }),
